@@ -16,25 +16,32 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.11
+        python-version: 3.12
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run Flask server
+    - name: Deploy application
       env:
         SERVER_IP: ${{ secrets.SERVER_IP }}
         DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
       run: |
-        echo "Deploying to local environment..."
+        echo "Deploying to environment..."
+        ssh root@${{ env.SERVER_IP }} << EOF
         cd ${{ env.DEPLOY_PATH }}
+        git pull origin main
+        pip install -r requirements.txt
         gunicorn -w 4 -b 0.0.0.0:5000 app:app &
+        EOF
         sleep 5
 
-    - name: Test endpoint
+    - name: Test prediction endpoint
       env:
         SERVER_IP: ${{ secrets.SERVER_IP }}
       run: |
-        curl -X GET http://${{ env.SERVER_IP }}:5000/predict
+        echo "Testing the /predict endpoint..."
+        curl -X POST -H "Content-Type: application/json" \
+        -d '[{"km4week": 100, "sp4week": 12.5, "Category": "Male"}, {"km4week": 120, "sp4week": 14.0, "Category": "Female"}]' \
+        http://${{ env.SERVER_IP }}:5000/predict
