@@ -1,0 +1,37 @@
+# Probar endpoint POST local
+curl -X POST -H "Content-Type: application/json" -d "{\"key\": \"value\"}" http://127.0.0.1:5000/update-data
+
+# Construir imagen docker
+docker build -t marathonpredictions .
+
+# Verificar imagen
+docker images
+
+# Ejecutar imagen
+docker run -p 5000:5000 marathonpredictions
+
+# Ver contenedores activos
+docker ps
+
+# Logs contenedor
+docker logs <CONTAINER_ID>
+
+# Detener el Contenedor
+docker stop <CONTAINER_ID>
+
+# Eliminar contenedor
+docker rm <CONTAINER_ID>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

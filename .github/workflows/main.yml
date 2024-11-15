@@ -16,21 +16,15 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: 3.11
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Deploy to server
+    - name: Deploy Locally
       env:
         SERVER_IP: ${{ secrets.SERVER_IP }}
         DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
       run: |
-        ssh root@${{ env.SERVER_IP }} << 'EOF'
+        echo "Deploying to local environment..."
         cd ${{ env.DEPLOY_PATH }}
-        git pull origin main
-        pip install -r requirements.txt
-        systemctl restart flask-service  # Placeholder para reiniciar el servidor
-        EOF
+        python app.py &
+        sleep 5
+        curl -X GET http://${{ secrets.SERVER_IP }}:5000/predict

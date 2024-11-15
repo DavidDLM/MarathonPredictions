@@ -2,27 +2,21 @@ import os
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 
+# Cargar las variables del archivo .env
 load_dotenv()
 
+# Configurar Flask
 app = Flask(__name__)
 
-# Leer variables del entorno
-host = os.getenv('FLASK_HOST', '127.0.0.1')
-port = int(os.getenv('FLASK_PORT', 5000))
-
-athlete_data = []
-
-# Endpoint para actualizar datos
+# Recibir y actualizar datos
 @app.route('/update-data', methods=['POST'])
 def update_data():
     data = request.json
     if not data:
         return jsonify({"error": "No data provided"}), 400
-    
-    athlete_data.append(data)
-    return jsonify({"message": "Data updated successfully", "data": data}), 200
+    return jsonify({"message": "Data received successfully", "data": data}), 200
 
-# Endpoint para predecir
+# Predecir
 @app.route('/predict', methods=['GET'])
 def predict():
     return jsonify({
@@ -31,4 +25,8 @@ def predict():
     }), 200
 
 if __name__ == '__main__':
-    app.run(host=host, port=port, debug=True)
+    app.run(
+        host=os.getenv('FLASK_HOST'),
+        port=int(os.getenv('FLASK_PORT')),
+        debug=os.getenv('FLASK_DEBUG') == 'True'
+    )
