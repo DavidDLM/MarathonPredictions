@@ -62,8 +62,4 @@ def updateData():
     return jsonify({"message": "Data received successfully", "data": data}), 200
 
 if __name__ == '__main__':
-    app.run(
-        host=os.getenv('FLASK_HOST'),
-        port=int(os.getenv('FLASK_PORT')),
-        debug=os.getenv('FLASK_DEBUG').lower() == 'true'
-    )
+    app.run(host='0.0.0.0', port=5000)

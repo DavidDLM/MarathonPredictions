@@ -18,32 +18,20 @@ jobs:
       with:
         python-version: 3.12
 
-    - name: Add SSH key
-      if: ${{ env.SERVER_IP != '127.0.0.1' }}
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-    - name: Deploy application (Local or Remote)
+    - name: Deploy application (Local)
       env:
         SERVER_IP: ${{ secrets.SERVER_IP }}
         DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
       run: |
-        if [ "${{ env.SERVER_IP }}" = "127.0.0.1" ]; then
-          echo "Running locally for testing..."
-          gunicorn -w 4 -b 0.0.0.0:5000 app:app &
-          sleep 10  # Aumenta el tiempo de espera
-        else
-          echo "Deploying to remote server..."
-          ssh -o StrictHostKeyChecking=no root@${{ env.SERVER_IP }} << 'EOF'
-            cd ${{ env.DEPLOY_PATH }}
-            git pull origin main
-            pip install -r requirements.txt
-            pkill gunicorn || true
-            gunicorn -w 4 -b 0.0.0.0:5000 app:app &
-        EOF
-          sleep 10
-        fi
+        echo "Deploying locally for testing..."
+        cd ${{ env.DEPLOY_PATH }}
+        gunicorn -w 4 -b 0.0.0.0:5000 app:app &
+        sleep 10
 
     - name: Test prediction endpoint
       env:
