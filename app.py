@@ -40,7 +40,7 @@ def predictEndpoint():
         return jsonify({"error": str(e)}), 500
 
 '''
-# Endpoint para entrenar el modelo
+# Endpoint para entrenar el modelo 
 @app.route('/train', methods=['POST'])
 def train_endpoint():
     try:
