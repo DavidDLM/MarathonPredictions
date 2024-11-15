@@ -3,10 +3,10 @@ name: Flask Deployment Pipeline
 on:
   push:
     branches:
-      - main  # Ejecutar el pipeline en cada cambio a la rama `main`
+      - main
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,15 +16,21 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.11
+        python-version: 3.9
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run Flask server and test endpoints
+    - name: Deploy to server
+      env:
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
       run: |
-        python app.py &
-        sleep 5
-        curl -X GET http://127.0.0.1:5000/predict
+        ssh root@${{ env.SERVER_IP }} << 'EOF'
+        cd ${{ env.DEPLOY_PATH }}
+        git pull origin main
+        pip install -r requirements.txt
+        systemctl restart flask-service  # Placeholder para reiniciar el servidor
+        EOF
