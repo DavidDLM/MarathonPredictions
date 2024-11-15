@@ -35,13 +35,13 @@ jobs:
           sleep 5
         else
           echo "Deploying to remote server..."
-          ssh -o StrictHostKeyChecking=no root@${{ env.SERVER_IP }} << EOF
-          cd ${{ env.DEPLOY_PATH }}
-          git pull origin main
-          pip install -r requirements.txt
-          pkill gunicorn || true
-          gunicorn -w 4 -b 0.0.0.0:5000 app:app &
-          EOF
+          ssh -o StrictHostKeyChecking=no root@${{ env.SERVER_IP }} << 'EOF'
+            cd ${{ env.DEPLOY_PATH }}
+            git pull origin main
+            pip install -r requirements.txt
+            pkill gunicorn || true
+            gunicorn -w 4 -b 0.0.0.0:5000 app:app &
+        EOF
         fi
 
     - name: Test prediction endpoint
