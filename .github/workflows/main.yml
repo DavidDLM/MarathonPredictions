@@ -35,12 +35,12 @@ jobs:
         else
           echo "Deploying to remote server..."
           ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_IP }} <<EOF
-          cd ${{ secrets.DEPLOY_PATH }}
-          git pull origin main
-          pip install -r requirements.txt
-          pkill gunicorn || true
-          gunicorn -w 4 -b 0.0.0.0:5000 app:app &
-          EOF
+cd ${{ secrets.DEPLOY_PATH }}
+git pull origin main
+pip install -r requirements.txt
+pkill gunicorn || true
+gunicorn -w 4 -b 0.0.0.0:5000 app:app &
+EOF
           sleep 10
         fi
 
