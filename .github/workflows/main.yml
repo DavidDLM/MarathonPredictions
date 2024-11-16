@@ -42,7 +42,7 @@ jobs:
           gunicorn -w 4 -b 0.0.0.0:5000 app:app &
           EOF
           sleep 10
-          fi
+        fi
 
     - name: Test prediction endpoint
       env:
