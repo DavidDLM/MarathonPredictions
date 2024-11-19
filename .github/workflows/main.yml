@@ -18,30 +18,31 @@ jobs:
       with:
         python-version: 3.12
 
-    - name: Add SSH key
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-    - name: Deploy application
+    - name: Deploy application to PythonAnywhere
       env:
-        SERVER_IP: ${{ secrets.SERVER_IP }}
-        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        PA_USERNAME: ${{ secrets.PA_USERNAME }}
+        PA_API_TOKEN: ${{ secrets.PA_API_TOKEN }}
       run: |
-        echo "Deploying to environment..."
-        ssh -o StrictHostKeyChecking=no root@${{ env.SERVER_IP }} << EOF
-        cd ${{ env.DEPLOY_PATH }}
-        git pull origin main
-        pip install -r requirements.txt
-        pkill gunicorn || true
-        gunicorn -w 4 -b 0.0.0.0:5000 app:app &
-        EOF
+        echo "Deploying to PythonAnywhere..."
+        curl -X POST https://www.pythonanywhere.com/api/v0/user/${{ env.PA_USERNAME }}/files/path/home/${{ env.PA_USERNAME }}/your_project/ \
+          -H "Authorization: Token ${{ env.PA_API_TOKEN }}" \
+          --form "path=app.py" \
+          --form "content=@app.py"
+        curl -X POST https://www.pythonanywhere.com/api/v0/user/${{ env.PA_USERNAME }}/webapps/ \
+          -H "Authorization: Token ${{ env.PA_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+                "path": "/home/${{ env.PA_USERNAME }}/your_project",
+                "virtualenv_path": "/home/${{ env.PA_USERNAME }}/your_project/venv",
+                "source_directory": "/home/${{ env.PA_USERNAME }}/your_project",
+                "web_framework": "flask"
+              }'
 
     - name: Test prediction endpoint
       env:
-        SERVER_IP: ${{ secrets.SERVER_IP }}
+        PA_USERNAME: ${{ secrets.PA_USERNAME }}
       run: |
         echo "Testing the /predict endpoint..."
         curl -X POST -H "Content-Type: application/json" \
         -d '[{"km4week": 100, "sp4week": 12.5, "Category": "Male"}, {"km4week": 120, "sp4week": 14.0, "Category": "Female"}]' \
-        http://${{ secrets.SERVER_IP }}:5000/predict
+        https://${{ secrets.PA_USERNAME }}.pythonanywhere.com/predict
