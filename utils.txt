@@ -1,6 +1,9 @@
 # Probar endpoint POST local
 curl -X POST -H "Content-Type: application/json" -d "{\"key\": \"value\"}" http://127.0.0.1:5000/update-data
 
+# Probar predicciones
+C:\Users\Gamer>curl -X POST -H "Content-Type: application/json" -d "[{\"km4week\": 100, \"sp4week\": 12.5, \"Category\": \"Male\"}, {\"km4week\": 120, \"sp4week\": 14.0, \"Category\": \"Female\"}]" http://127.0.0.1:5000/predict
+
 # Construir imagen docker
 docker build -t marathonpredictions .
 
