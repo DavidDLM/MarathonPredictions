@@ -8,7 +8,7 @@ from sklearn.metrics import mean_absolute_error, r2_score
 import joblib
 
 class MarathonModel:
-    def trainModel(self, dataPath, modelPath):
+    def trainModel(self, dataPath, modelPath):  # Add self here
         data = pd.read_csv(dataPath)
         X = data[['km4week', 'sp4week', 'Category']]
         y = data['MarathonTime']

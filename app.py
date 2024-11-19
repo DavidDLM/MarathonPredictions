@@ -14,6 +14,9 @@ print(type(model))
 # Instancia de la clase para entrenar y predecir
 marathon_model = MarathonModel()
 
+MODEL_PATH = './models/marathon_model.pkl'
+DATA_PATH = './src/data/MarathonData.csv'
+
 # Endpoint para predecir
 @application.route('/predict', methods=['POST'])
 def predictEndpoint():
@@ -39,6 +42,23 @@ def updateData():
     if not data:
         return jsonify({"error": "No data provided"}), 400
     return jsonify({"message": "Data received successfully", "data": data}), 200
+
+# Endpoint para entrenar el modelo
+@application.route('/train', methods=['POST'])
+def train_endpoint():
+    try:
+        
+        # Verificar el parámetro `train` en el cuerpo de la solicitud
+        train_flag = request.json.get('train', False)
+        
+        if train_flag:
+            # Entrenar el modelo
+            marathon_model.trainModel(DATA_PATH, MODEL_PATH)
+            return jsonify({"message": "Modelo entrenado con éxito"}), 200
+        else:
+            return jsonify({"message": "No se activó el entrenamiento"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 if __name__ == '__main__':
     application.run(host='0.0.0.0', port=5000)

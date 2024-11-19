@@ -43,6 +43,36 @@ function App() {
     }
   };
 
+  const handleTrainRequest = async () => {
+    const data = {
+      "train": true
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await axios.post(
+        "http://127.0.0.1:5000/train",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Server Response:", result);
+      setResponse(result.data);
+      if (result.status === 200) { alert("Se ha vuelto a entrenar el modelo con la información del CSV correctamente.")}
+    } catch (err) {
+      console.error("Request Error:", err);
+      setError("Error en la solicitud: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const formatTime = (decimalHours) => {
     const hours = Math.floor(decimalHours);
     const minutes = Math.floor((decimalHours - hours) * 60);
@@ -97,16 +127,24 @@ function App() {
             />
           </div>
 
-          <button
-            onClick={handlePostRequest}
-            disabled={loading}
-            className={`w-full py-2 rounded-lg text-white font-semibold ${loading
+          <div className="flex flex-row gap-3">
+            <button
+              onClick={handleTrainRequest}
+              className={`p-4 rounded-xl w-fit text-white font-semibold bg-blue-500`}
+            >
+              Train
+            </button>
+            <button
+              onClick={handlePostRequest}
+              disabled={loading}
+              className={`w-full py-2 rounded-lg text-white font-semibold ${loading
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-500 hover:bg-blue-600"
-              }`}
-          >
-            {loading ? "Cargando..." : "Enviar"}
-          </button>
+                }`}
+            >
+              {loading ? "Cargando..." : "Enviar"}
+            </button>
+          </div>
 
           {response && (
             <div className="mt-6 bg-green-100 text-green-800 p-4 rounded-lg">
