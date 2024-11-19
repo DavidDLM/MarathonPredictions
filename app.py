@@ -2,8 +2,10 @@ from flask import Flask, request, jsonify
 import pandas as pd
 import joblib
 from src.train import MarathonModel
+from flask_cors import CORS
 
 application = Flask(__name__)
+CORS(application)
 
 # Cargar el modelo
 model = joblib.load('./models/marathon_model.pkl')
